@@ -14,33 +14,16 @@ namespace AWSBookList.Database
     public class DynamoAbstract<T> where T : class, new() {
         public IDynamoDBContext context;
         private Amazon.DynamoDBv2.AmazonDynamoDBClient amazonDynamoDBClient { get; set; }
-        //protected DynamoAbstract() {
+        protected DynamoAbstract() {
+            Credentials c = GetTemporaryCredentialsAsync().GetAwaiter().GetResult();
 
-            //amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(stsCredentials, Amazon.RegionEndpoint.USEast1);
-            // amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(awsAccessKeyId: "AKIASCBEI6XRDHHS77M2", awsSecretAccessKey: "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", Amazon.RegionEndpoint.USEast1);
+            amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(c.AccessKeyId, c.SecretAccessKey, Amazon.RegionEndpoint.USEast1);
+            //amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(awsAccessKeyId: "AKIASCBEI6XRDHHS77M2", awsSecretAccessKey: "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", Amazon.RegionEndpoint.USEast1);
 
-            //context = new DynamoDBContext(amazonDynamoDBClient);
-        //}
-         
-        public void Main()
-        {
-
-            Sla().Wait();
-            
+            context = new DynamoDBContext(amazonDynamoDBClient);
         }
 
-        private static async Task<DynamoDBContext> Sla()
-        {
-            SessionAWSCredentials tempCredentials = await GetTemporaryCredentialsAsync();
-
-            Amazon.DynamoDBv2.AmazonDynamoDBClient amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(tempCredentials, Amazon.RegionEndpoint.USEast1);
-
-            DynamoDBContext context = new DynamoDBContext(amazonDynamoDBClient);
-
-            return context;
-        }
-
-        public static async Task<SessionAWSCredentials> GetTemporaryCredentialsAsync()
+        public static async Task<Credentials> GetTemporaryCredentialsAsync()
         {
             using (var stsClient = new AmazonSecurityTokenServiceClient())
             {
@@ -49,8 +32,7 @@ namespace AWSBookList.Database
                     DurationSeconds = 900 // seconds
                 };
 
-                GetSessionTokenResponse sessionTokenResponse =
-                              await stsClient.GetSessionTokenAsync(getSessionTokenRequest);
+                GetSessionTokenResponse sessionTokenResponse =  await stsClient.GetSessionTokenAsync(getSessionTokenRequest);
 
                 Credentials credentials = sessionTokenResponse.Credentials;
 
@@ -59,10 +41,7 @@ namespace AWSBookList.Database
                                               credentials.SecretAccessKey,
                                               credentials.SessionToken);
 
-                return sessionCredentials;
-
-
-                System.Diagnostics.Debug.WriteLine(sessionCredentials);
+                return credentials;
             }
         }
 
