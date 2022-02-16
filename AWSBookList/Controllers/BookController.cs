@@ -1,8 +1,10 @@
-﻿using AWSBookList.Database;
+﻿using Amazon.DynamoDBv2.Model;
+using AWSBookList.Database;
 using AWSBookList.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,6 +31,7 @@ namespace AWSBookList.Controllers
             return Created($"/{book.IdBook}", book);
         }
 
+
         [HttpGet]
         [Route("")]
         public async Task<IActionResult> GetAll()
@@ -43,9 +46,37 @@ namespace AWSBookList.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             var result = await this.bookRepository.GetById(id);
-            if(!result.Any()) return NotFound();
+            if (!result.Any()) return NotFound();
             else return Ok(result.FirstOrDefault());
         }
+
+        [HttpGet]
+        [Route("author/{Author}")]
+        public async Task<IActionResult> GetByAuthor(String author)
+        {
+            var result = await this.bookRepository.GetByAuthor(author);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("genre/{Genre}")]
+        public async Task<IActionResult> GetByGenre(String genre)
+        {
+            var result = await this.bookRepository.GetByGenre(genre);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("title/{Title}")]
+        public async Task<IActionResult> GetByTitle(String title)
+        {
+            var result = await this.bookRepository.GetByTitle(title);
+
+            return Ok(result);
+        }
+
 
         [HttpPut]
         [Route("{id}")]
@@ -57,6 +88,7 @@ namespace AWSBookList.Controllers
 
             return Ok(result.FirstOrDefault());
         }
+
 
         [HttpDelete]
         [Route("{id}")]
