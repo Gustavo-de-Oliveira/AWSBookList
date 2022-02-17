@@ -14,11 +14,10 @@ namespace AWSBookList.Database
     public class DynamoAbstract<T> where T : class, new() {
         public IDynamoDBContext context;
         private Amazon.DynamoDBv2.AmazonDynamoDBClient amazonDynamoDBClient { get; set; }
-        protected DynamoAbstract() {
+        protected DynamoAbstract() { 
             Credentials c = GetTemporaryCredentialsAsync().GetAwaiter().GetResult();
 
-            amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(c.AccessKeyId, c.SecretAccessKey, Amazon.RegionEndpoint.USEast1);
-            //amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(awsAccessKeyId: "AKIASCBEI6XRDHHS77M2", awsSecretAccessKey: "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", Amazon.RegionEndpoint.USEast1);
+            amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(c.AccessKeyId, c.SecretAccessKey,c.SessionToken, Amazon.RegionEndpoint.USEast1);
 
             context = new DynamoDBContext(amazonDynamoDBClient);
         }
