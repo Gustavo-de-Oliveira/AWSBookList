@@ -7,7 +7,6 @@ namespace AWSBookList.Model
     public class Book
     {
         [DynamoDBHashKey]
-
         public Guid IdBook { get; set; }
 
         [DynamoDBProperty]
