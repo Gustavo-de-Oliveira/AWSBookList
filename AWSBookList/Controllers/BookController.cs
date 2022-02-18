@@ -22,7 +22,6 @@ namespace AWSBookList.Controllers
 
         [HttpPost]
         [Route("")]
-
         public async Task<IActionResult> Save(Book book)
         {
             book.IdBook = Guid.NewGuid();

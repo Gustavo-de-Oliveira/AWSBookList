@@ -1,28 +1,53 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Amazon.SecurityToken;
+using Amazon.SecurityToken.Model;
+using Amazon.Runtime;
 using Amazon.DynamoDBv2.DocumentModel;
 using AWSBookList.Model;
-
 
 namespace AWSBookList.Database
 {
     public class DynamoAbstract<T> where T : class, new() {
-        private readonly IDynamoDBContext context;
+        public IDynamoDBContext context;
         private Amazon.DynamoDBv2.AmazonDynamoDBClient amazonDynamoDBClient { get; set; }
         public object DynamoDbClientService { get; private set; }
 
         protected DynamoAbstract() { 
+            Credentials c = GetTemporaryCredentialsAsync().GetAwaiter().GetResult();
 
-            amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(awsAccessKeyId: "AKIASCBEI6XRO2VRL2UE", awsSecretAccessKey: "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", Amazon.RegionEndpoint.USEast1);
+            amazonDynamoDBClient = new Amazon.DynamoDBv2.AmazonDynamoDBClient(c.AccessKeyId, c.SecretAccessKey,c.SessionToken, Amazon.RegionEndpoint.USEast1);
 
             context = new DynamoDBContext(amazonDynamoDBClient);
         }
-        
+
+        public static async Task<Credentials> GetTemporaryCredentialsAsync()
+        {
+            using (var stsClient = new AmazonSecurityTokenServiceClient())
+            {
+                var getSessionTokenRequest = new GetSessionTokenRequest
+                {
+                    DurationSeconds = 900 // seconds
+                };
+
+                GetSessionTokenResponse sessionTokenResponse =  await stsClient.GetSessionTokenAsync(getSessionTokenRequest);
+
+                Credentials credentials = sessionTokenResponse.Credentials;
+
+                var sessionCredentials =
+                    new SessionAWSCredentials(credentials.AccessKeyId,
+                                              credentials.SecretAccessKey,
+                                              credentials.SessionToken);
+
+                return credentials;
+            }
+        }
+
         protected async Task<List<T>> Scan() {
 
             return await context.ScanAsync<T>(new List<ScanCondition>()).GetRemainingAsync();
@@ -70,7 +95,6 @@ namespace AWSBookList.Database
 
             return listaLivros;
         }
-
         protected async Task<List<T>> QueryByGenre(String genre)
         {
             List<ScanCondition> conditions = new List<ScanCondition>();
@@ -90,7 +114,7 @@ namespace AWSBookList.Database
 
             return response;
         }
-
+        
         protected async Task Save(T obj) 
         {
             await context.SaveAsync<T>(obj);   
