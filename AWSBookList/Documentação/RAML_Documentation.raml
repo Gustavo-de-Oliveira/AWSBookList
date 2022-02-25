@@ -1,0 +1,135 @@
+#%RAML 1.0
+title: Books API
+baseUri: http://localhost:44359/api
+version: 1.0  
+mediaType: application/json
+
+types:
+  book:
+    properties:
+      IdBook:
+        type: string
+
+      Author:
+        type: string
+
+      Genre:
+        type: string
+
+      Title:
+        type: string
+
+    example:
+      id: "1b36ea1c9b7a1c3ad668b8bb5df7963f"
+      author: "George Orwell" 
+      genre: "Distopia"
+      title: "1984"
+
+  Mensagem:
+    properties:
+      mensagem: 
+        type: string
+
+/books:
+  get:
+    responses:         
+      200:               
+        body:
+          type: books[]  
+      500:          
+        body:
+          type: Mensagem
+          example:
+            mensagem: Ocorreu um erro inesperado
+
+  post:
+    body:             
+      type: book
+
+    responses:
+      200:            
+        body:
+          type: Mensagem  
+          example: 
+            mensagem: Operação realizada com sucesso   
+      400:           
+        body:
+          type: Mensagem
+          example:
+            mensagem: "Cliente inválido"
+
+/books/{id}:
+    get:
+      responses:         
+      200:               
+        body:
+          type: books[]  
+      500:          
+        body:
+          type: Mensagem
+          example:
+            mensagem: Ocorreu um erro inesperado
+
+    put:
+      body:
+          type: book
+      responses:
+        200:
+          body:
+            type: Mensagem
+            example:
+              mensagem: Operação realizada com sucesso    
+        500:          
+          body:
+            type: Mensagem
+            example:
+              mensagem: Ocorreu um erro inesperado
+
+    delete:
+      responses:
+        200:   
+          body:
+            type: Mensagem
+            example:
+              mensagem: Operação realizada com sucesso
+        500:          
+          body:
+            type: Mensagem
+            example:
+              mensagem: Ocorreu um erro inesperado     
+
+/books/author/{Author}:
+      get:
+        responses:         
+      200:               
+        body:
+          type: books[]  
+      500:          
+        body:
+          type: Mensagem
+          example:
+            mensagem: Ocorreu um erro inesperado
+
+/books/genre/{Genre}:
+      get:
+        responses:         
+      200:               
+        body:
+          type: books[]  
+      500:          
+        body:
+          type: Mensagem
+          example:
+            mensagem: Ocorreu um erro inesperado
+
+/books/title/{Title}:
+        get:
+          responses:         
+        200:               
+          body:
+            type: books[]  
+        500:          
+          body:
+            type: Mensagem
+            example:
+              mensagem: Ocorreu um erro inesperado

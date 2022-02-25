@@ -1,0 +1,288 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server to save books."
+  version: "1.0.0"
+  title: "Store books"
+basePath: "/v1"
+tags:
+- name: "Book"
+schemes:
+- "https"
+- "http"
+
+paths:
+  /book:
+    post:
+      tags:
+      - "Book"
+      summary: "Add a new book to the storage"
+      description: "Insert a obj with the data"
+      operationId: "addBook"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Book object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Book"
+      responses:
+        "400":
+          description: "Invalid input"
+      security:
+      - book_auth:
+        - "write:books"
+        - "read:books"
+    get:
+      tags:
+      - "Book"
+      summary: "List books"
+      description: "Returns all books"
+      operationId: "getBooks"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+  /book/{IdBook}:
+    get:
+      tags:
+      - "Book"
+      summary: "Find book by ID"
+      description: "Returns a single book"
+      operationId: "getBookById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "IdBook"
+        in: "path"
+        description: "ID of pet to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+    put:
+      tags:
+      - "Book"
+      summary: "Updates a book in the store"
+      description: ""
+      operationId: "updateBookWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "IdBook"
+        in: "path"
+        description: "ID of book that needs to be updated"
+        required: true
+        type: "string"
+      - name: "Author"
+        in: "formData"
+        description: "Updated author of the book"
+        required: true
+        type: "string"
+      - name: "Genre"
+        in: "formData"
+        description: "Updated genre of the book"
+        required: true
+        type: "string"
+      - name: "Title"
+        in: "formData"
+        description: "Updated title of the book"
+        required: true
+        type: "string"
+      responses:
+        "405":
+          description: "Invalid input"
+      security:
+      - book_auth:
+        - "write:books"
+        - "read:books"
+    delete:
+      tags:
+      - "Book"
+      summary: "Deletes a book"
+      description: ""
+      operationId: "deleteBook"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "IdBook"
+        in: "path"
+        description: "Book id to delete"
+        required: true
+        type: "string"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - book_auth:
+        - "write:books"
+        - "read:books"
+  /book/author/{Author}:
+    get:
+      tags:
+      - "Book"
+      summary: "Find book by author"
+      description: "Returns a book list"
+      operationId: "getBookByAuthor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "Author"
+        in: "path"
+        description: "Author of books to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+  /book/genre/{Genre}:
+    get:
+      tags:
+      - "Book"
+      summary: "Find book by author"
+      description: "Returns a single book"
+      operationId: "getBookByGenre"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "Genre"
+        in: "path"
+        description: "Author of books to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+  /book/title/{Title}:
+    get:
+      tags:
+      - "Book"
+      summary: "Find book by title"
+      description: "Returns a single book"
+      operationId: "getBookByTitle"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "Title"
+        in: "path"
+        description: "Author of books to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+    
+securityDefinitions:
+  book_auth:
+    type: "oauth2"
+    authorizationUrl: "http://book.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:books: "modify pets in your account"
+      read:books: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+    
+definitions:
+  Book:
+    type: "object"
+    required:
+    - "IdBook"
+    - "Author"
+    - "Genre"
+    - "Title"
+    
+    properties:
+      IdBook:
+        type: "string"
+        example: "1b36ea1c9b7a1c3ad668b8bb5df7963f"
+        
+      Author:
+        type: "string"
+        example: "George Orwell"
+        
+      Genre:
+        type: "string"
+        example: "Distopia"
+        
+      Title:
+        type: "string"
+        example: "1984"
+        
+    xml:
+      name: "Book"
+      
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
